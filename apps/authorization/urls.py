@@ -1,12 +1,11 @@
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
+from .views import profile,login_view
 from rest_framework import routers
 router = routers.DefaultRouter()
 
 
 urlpatterns = [
-    path('api/token/access/', TokenRefreshView.as_view(), name='token_get_access'),
-    path('api/token/both/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('profile', profile, name='profile'),
+    path('login/', login_view, name='login_view'),
     path('api/', include(router.urls))
 ]
