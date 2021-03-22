@@ -6,6 +6,6 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('profile', profile, name='profile'),
-    path('login/', login_view, name='login_view'),
+    path('login', login_view, name='login_view'),
     path('api/', include(router.urls))
 ]

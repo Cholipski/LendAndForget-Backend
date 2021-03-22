@@ -7,7 +7,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from .serializers import UserSerializer
 from .utils import generate_access_token, generate_refresh_token
 
-
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @ensure_csrf_cookie
