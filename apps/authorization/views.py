@@ -1,33 +1,21 @@
+import jwt
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.urls import reverse
 from rest_framework import generics, status
+from rest_framework.decorators import permission_classes
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile
-from .serializers import UserSerializer, UserProfileSerializer
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .serializers import UserSerializer, UserProfileSerializer, MyTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from .utils import Util
+from django.conf import settings
 
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        return token
-
-    def validate(self, attrs):
-        data = super().validate(attrs)
-
-        refresh = self.get_token(self.user)
-
-        data['refresh'] = str(refresh)
-        data['access'] = str(refresh.access_token)
-        data['username'] = self.user.username
-        data['email'] = self.user.email
-
-        return data
-
-
+@permission_classes([AllowAny])
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
@@ -56,6 +44,7 @@ class UserProfileDetail(generics.RetrieveAPIView):
     name = 'userprofile-detail'
 
 
+@permission_classes([AllowAny])
 class RegisterView(GenericAPIView):
     serializer_class = UserSerializer
     name = 'register'
@@ -65,9 +54,48 @@ class RegisterView(GenericAPIView):
 
         if serializer.is_valid():
             serializer.save()
+            user = User.objects.get(email=serializer.data['email'])
+            user.is_active = False
+            user.save()
+            token = RefreshToken.for_user(user)
+            relative_link = reverse('email-verify')
+
+            url = 'http://127.0.0.1:3000' + relative_link + "/" + str(token)
+            email_body = "Hi " + user.username + '! \nUse link below to activate your account!. \n' + url
+            data = {"to_email": user.email, "email_body": email_body, 'email_subject': 'Verify your email!'}
+            Util.send_activation_email(data)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyEmail(generics.GenericAPIView):
+    def get(self, request):
+        token = request.GET.get('token')
+        res = {
+            'status': '',
+            'message': '',
+        }
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            user = User.objects.get(id=payload['user_id'])
+            if not user.is_active:
+                user.is_active = True
+                user.save()
+                res['status'] = 'success'
+                res['message'] = 'Successfully activated'
+
+            return JsonResponse(res)
+
+        except jwt.ExpiredSignatureError:
+            res['status'] = 'failed'
+            res['message'] = 'Activation expired'
+            return JsonResponse(res)
+
+        except jwt.exceptions.DecodeError:
+            res['status'] = 'failed'
+            res['message'] = 'Invalid token'
+            return JsonResponse(res)
 
 
 class ApiRoot(generics.GenericAPIView):
