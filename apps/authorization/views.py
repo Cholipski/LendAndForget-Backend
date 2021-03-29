@@ -1,3 +1,5 @@
+import json
+
 import jwt
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -60,7 +62,7 @@ class RegisterView(GenericAPIView):
             token = RefreshToken.for_user(user)
             relative_link = reverse('email-verify')
 
-            url = 'http://127.0.0.1:3000' + relative_link + "/" + str(token)
+            url = 'http://localhost:3000' + relative_link + "/" + str(token)
             email_body = "Hi " + user.username + '! \nUse link below to activate your account!. \n' + url
             data = {"to_email": user.email, "email_body": email_body, 'email_subject': 'Verify your email!'}
             Util.send_activation_email(data)
@@ -70,8 +72,8 @@ class RegisterView(GenericAPIView):
 
 
 class VerifyEmail(generics.GenericAPIView):
-    def get(self, request):
-        token = request.GET.get('token')
+    def post(self, request):
+        token = json.loads(request.body)
         res = {
             'status': '',
             'message': '',
