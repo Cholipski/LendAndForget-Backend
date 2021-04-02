@@ -72,6 +72,9 @@ class ReturnLend(generics.GenericAPIView):
             lend_id = json.load(request.body)
             loan = Loan.objects.get(id=lend_id)
             loan.loanStatusID = 2
-        except EnvironmentError:
+            loan.save()
+            response['status'] = 'Status changed'
+            return response
+        except Exception:
             response['status'] = 'Something bad happened'
             return response

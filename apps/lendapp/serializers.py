@@ -1,3 +1,4 @@
+import datetime
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import ItemCategory, LoanStatus, Loan, MoneyLoan
@@ -31,3 +32,13 @@ class LoanSerializer(serializers.ModelSerializer):
                   'description', 'startDate', 'endDate',
                   'itemAmount', 'borrowerID',
                   'loanStatusID', 'itemCategoryID']
+
+    def validate(self, attrs):
+        startDate = attrs.get('startDate', '')
+        endDate = attrs.get('endDate', '')
+        if endDate:
+            if startDate and endDate < startDate:
+                raise serializers.ValidationError({'endDate': 'The end date cannot precede the start date'})
+            if endDate < datetime.date.today():
+                raise serializers.ValidationError({'endDate': 'The end date cannot be earlier than today'})
+        return super().validate(attrs)
