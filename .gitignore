@@ -19,5 +19,3 @@
 *.pyc
 __pycache__
 media
-
-.lend_and_forget/__pycache__/*
