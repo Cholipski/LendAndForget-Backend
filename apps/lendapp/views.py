@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, serializers
 from .models import ItemCategory, LoanStatus, Loan
 from .serializers import ItemCategorySerializer, LoanStatusSerializer, LoanSerializer
 from rest_framework.reverse import reverse
@@ -34,6 +34,12 @@ class LoanList(generics.ListCreateAPIView):
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
     name = 'loan-list'
+    lenderID = serializers.PrimaryKeyRelatedField(
+        read_only=True,
+    )
+
+    def perform_create(self, serializer):
+        serializer.save(lenderID=self.request.user)
 
 
 class LoanDetail(generics.RetrieveAPIView):

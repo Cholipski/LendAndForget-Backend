@@ -16,7 +16,6 @@ class LoanStatusSerializer(serializers.ModelSerializer):
 
 
 class LoanSerializer(serializers.ModelSerializer):
-    lenderID = serializers.SerializerMethodField('_user')
     borrowerID = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='id')
     loanStatusID = serializers.SlugRelatedField(queryset=LoanStatus.objects.all(), slug_field='id')
     itemCategoryID = serializers.SlugRelatedField(queryset=ItemCategory.objects.all(), slug_field='id')
@@ -30,5 +29,5 @@ class LoanSerializer(serializers.ModelSerializer):
         model = Loan
         fields = ['pk', 'url', 'name',
                   'description', 'startDate', 'endDate',
-                  'itemAmount', 'lenderID', 'borrowerID',
+                  'itemAmount', 'borrowerID',
                   'loanStatusID', 'itemCategoryID']

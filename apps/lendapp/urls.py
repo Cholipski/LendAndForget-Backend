@@ -11,6 +11,6 @@ urlpatterns = [
     path('LoanStatus/<int:pk>/', views.LoanStatusDetail.as_view(), name=views.LoanStatusDetail.name),
     path('Loan/', views.LoanList.as_view(), name=views.LoanList.name),
     path('Loan/<int:pk>/', views.LoanDetail.as_view(), name=views.LoanDetail.name),
-    path('return/<int:pk>/', views.ReturnLend.as_view(), name="Return a loan"),
+    path('return/', views.ReturnLend.as_view(), name="Return a loan"),
     path('', views.ApiRoot.as_view(), name=views.ApiRoot.name),
 ]
