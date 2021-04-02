@@ -57,3 +57,5 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['url', 'pk', 'user', 'phone_number']
+
+
