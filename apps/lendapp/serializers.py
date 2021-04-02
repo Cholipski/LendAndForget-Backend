@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import ItemCategory, LoanStatus, Loan, MoneyLoan
 
@@ -15,11 +16,15 @@ class LoanStatusSerializer(serializers.ModelSerializer):
 
 
 class LoanSerializer(serializers.ModelSerializer):
-    lenderID = serializers.ReadOnlyField(source='lenderID.username')
-    borrowerID = serializers.HyperlinkedRelatedField(many=True, read_only=True,
-                                                     view_name='rest_api: borrower-detail')
+    lenderID = serializers.SerializerMethodField('_user')
+    borrowerID = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='id')
     loanStatusID = serializers.SlugRelatedField(queryset=LoanStatus.objects.all(), slug_field='id')
     itemCategoryID = serializers.SlugRelatedField(queryset=ItemCategory.objects.all(), slug_field='id')
+
+    def _user(self, obj):
+        request = self.context.get('request', None)
+        if request:
+            return request.User
 
     class Meta:
         model = Loan
