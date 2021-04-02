@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile, ItemCategory, LoanStatus, Loan, MoneyLoan
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -57,3 +57,4 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['url', 'pk', 'user', 'phone_number']
+
