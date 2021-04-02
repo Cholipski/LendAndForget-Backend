@@ -1,4 +1,7 @@
+import datetime
+
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -27,6 +30,13 @@ class Loan(models.Model):
     loanStatusID = models.ForeignKey(LoanStatus, on_delete=models.CASCADE, null=False, related_name='Loan_loanStatus')
     itemCategoryID = models.ForeignKey(ItemCategory, on_delete=models.CASCADE, null=False, related_name='ItemCategory')
 
+    def save(self, *args, **kwargs):
+        if self.startDate:
+            if self.endDate < self.startDate:
+                raise ValidationError('end date can not be before start date')
+        if self.endDate < datetime.date.today():
+            raise ValidationError('end date can not be before today')
+        super(Loan, self).save(*args, **kwargs)
 
 class MoneyLoan(models.Model):
     name = models.CharField(max_length=45, null=False)
