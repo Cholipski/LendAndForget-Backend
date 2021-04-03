@@ -33,6 +33,14 @@ class LoanSerializer(serializers.ModelSerializer):
                   'itemAmount', 'borrowerID',
                   'loanStatusID', 'itemCategoryID']
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['itemCategoryID'] = instance.itemCategoryID.categoryName
+        rep['loanStatusID'] = instance.loanStatusID.statusName
+        rep['borrowerID'] = instance.borrowerID.first_name + " " + instance.borrowerID.last_name
+
+        return rep
+
     def validate(self, attrs):
         startDate = attrs.get('startDate', '')
         endDate = attrs.get('endDate', '')
@@ -42,3 +50,4 @@ class LoanSerializer(serializers.ModelSerializer):
             if endDate < datetime.date.today():
                 raise serializers.ValidationError({'endDate': 'The end date cannot be earlier than today'})
         return super().validate(attrs)
+
