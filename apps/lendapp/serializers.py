@@ -37,7 +37,7 @@ class LoanSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep['itemCategoryID'] = instance.itemCategoryID.categoryName
         rep['loanStatusID'] = instance.loanStatusID.statusName
-        rep['borrowerID'] = instance.borrowerID.first_name + " " + instance.borrowerID.last_name
+        rep['borrowerID'] = instance.borrowerID.username
 
         return rep
 
