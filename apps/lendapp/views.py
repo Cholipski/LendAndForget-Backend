@@ -1,6 +1,6 @@
 from rest_framework import generics, serializers
 from rest_framework.permissions import IsAuthenticated
-
+from django.http import JsonResponse
 from .models import ItemCategory, LoanStatus, Loan
 from .serializers import ItemCategorySerializer, LoanStatusSerializer, LoanSerializer
 from rest_framework.reverse import reverse
@@ -66,15 +66,14 @@ class ApiRoot(generics.GenericAPIView):
 class ReturnLend(generics.GenericAPIView):
     def post(self, request):
         response = {
-            'status': ''
+            'status': 403,
         }
         try:
-            lend_id = json.load(request.body)
+            lend_id = json.loads(request.body)
             loan = Loan.objects.get(id=lend_id)
-            loan.loanStatusID = 2
+            loan.loanStatusID_id = 2
             loan.save()
-            response['status'] = 'Status changed'
-            return response
-        except Exception:
-            response['status'] = 'Something bad happened'
-            return response
+            response['status'] = 200
+            return JsonResponse(response)
+        except:
+            return JsonResponse(response)
