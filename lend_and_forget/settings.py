@@ -115,30 +115,30 @@ SIMPLE_JWT = {
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': '00436236_lend_and_forget',
-#        'USER': '00436236_lend_and_forget',
-#        'PASSWORD': 'NvHGsu3O',
-#        'HOST': 'hosting2049919.online.pro',
-#        'PORT': '5432'
-#    }
-#}
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': '00436236_lendapp',
-        'USER': '00436236_lendapp',
-        'PASSWORD': 'NvHGsu30',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': '00436236_lend_and_forget',
+        'USER': '00436236_lend_and_forget',
+        'PASSWORD': 'NvHGsu3O',
         'HOST': 'hosting2049919.online.pro',
-        'PORT': '3306',
-        'OPTIONS': {
-                    'charset': 'latin2',
-                    'use_unicode': True, },
+        'PORT': '5432'
     }
 }
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': '00436236_lendapp',
+#        'USER': '00436236_lendapp',
+#        'PASSWORD': 'NvHGsu30',
+#        'HOST': 'hosting2049919.online.pro',
+#        'PORT': '3306',
+#        'OPTIONS': {
+#                    'charset': 'latin2',
+#                    'use_unicode': True, },
+#    }
+#}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
