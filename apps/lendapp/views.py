@@ -41,21 +41,22 @@ class LoanList(generics.ListCreateAPIView):
     )
 
     def perform_create(self, serializer):
-        serializer.save(lenderID=self.request.user)
+        serializer.save(lenderID=self.request.user, loanStatusID_id="1")
 
     def get_queryset(self):
         qs = Loan.objects.filter(lenderID=self.request.user) | Loan.objects.filter(borrowerID=self.request.user)
         return qs
 
+
+class LoanDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Loan.objects.all()
+    serializer_class = LoanSerializer
+    name = 'loan-detail'
+
     def destroy(self, *args, **kwargs):
         serializer = self.get_serializer(self.get_object())
         super().destroy(*args, **kwargs)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
-
-class LoanDetail(generics.RetrieveAPIView):
-    queryset = Loan.objects.all()
-    serializer_class = LoanSerializer
-    name = 'loan-detail'
 
 
 class ApiRoot(generics.GenericAPIView):

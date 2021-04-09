@@ -28,12 +28,6 @@ class Loan(models.Model):
     loanStatusID = models.ForeignKey(LoanStatus, on_delete=models.CASCADE, null=False, related_name='Loan_loanStatus')
     itemCategoryID = models.ForeignKey(ItemCategory, on_delete=models.CASCADE, null=False, related_name='ItemCategory')
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-        self.loanStatusID = LoanStatus.objects.get(id=1)
-        super(Loan, self).save(force_insert, force_update)
-
-
 
 class MoneyLoan(models.Model):
     name = models.CharField(max_length=45, null=False)
