@@ -17,7 +17,7 @@ class LoanStatusSerializer(serializers.ModelSerializer):
 
 
 class LoanSerializer(serializers.ModelSerializer):
-    borrowerID = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='id')
+    borrowerID = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='email')
     itemCategoryID = serializers.SlugRelatedField(queryset=ItemCategory.objects.all(), slug_field='id')
 
     def _user(self, obj):

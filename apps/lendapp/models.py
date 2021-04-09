@@ -21,7 +21,7 @@ class Loan(models.Model):
     name = models.CharField(max_length=45, null=False)
     description = models.CharField(max_length=255, null=True)
     startDate = models.DateField(null=False)
-    endDate = models.DateField(null=True)
+    endDate = models.DateField(null=True, blank=True)
     itemAmount = models.IntegerField(null=False)
     lenderID = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='Loan_lender')
     borrowerID = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='Loan_borrower')

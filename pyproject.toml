@@ -12,6 +12,7 @@ psycopg2 = "^2.8.6"
 djangorestframework-simplejwt = "^4.6.0"
 django-cors-headers = "^3.7.0"
 asgiref = "^3.3.1"
+mysqlclient = "^2.0.3"
 
 [tool.poetry.dev-dependencies]
 
