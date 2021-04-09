@@ -18,7 +18,6 @@ class LoanStatusSerializer(serializers.ModelSerializer):
 
 class LoanSerializer(serializers.ModelSerializer):
     borrowerID = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='id')
-    loanStatusID = serializers.SlugRelatedField(queryset=LoanStatus.objects.all(), slug_field='id')
     itemCategoryID = serializers.SlugRelatedField(queryset=ItemCategory.objects.all(), slug_field='id')
 
     def _user(self, obj):
@@ -30,8 +29,7 @@ class LoanSerializer(serializers.ModelSerializer):
         model = Loan
         fields = ['pk', 'url', 'name',
                   'description', 'startDate', 'endDate',
-                  'itemAmount', 'borrowerID',
-                  'loanStatusID', 'itemCategoryID']
+                  'itemAmount', 'borrowerID', 'itemCategoryID']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
