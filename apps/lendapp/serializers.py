@@ -38,6 +38,7 @@ class LoanSerializer(serializers.ModelSerializer):
         rep['itemCategoryID'] = instance.itemCategoryID.categoryName
         rep['loanStatusID'] = instance.loanStatusID.statusName
         rep['borrowerID'] = instance.borrowerID.username
+        rep['lenderID'] = instance.lenderID.username
 
         return rep
 

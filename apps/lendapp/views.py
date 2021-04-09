@@ -1,4 +1,4 @@
-from rest_framework import generics, serializers
+from rest_framework import generics, serializers, response, status
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from .models import ItemCategory, LoanStatus, Loan
@@ -46,6 +46,11 @@ class LoanList(generics.ListCreateAPIView):
     def get_queryset(self):
         qs = Loan.objects.filter(lenderID=self.request.user) | Loan.objects.filter(borrowerID=self.request.user)
         return qs
+
+    def destroy(self, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object())
+        super().destroy(*args, **kwargs)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
 
 class LoanDetail(generics.RetrieveAPIView):
     queryset = Loan.objects.all()
