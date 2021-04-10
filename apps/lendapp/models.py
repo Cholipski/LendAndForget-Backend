@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-
+from .utils import *
 
 
 class ItemCategory(models.Model):
@@ -27,6 +27,7 @@ class Loan(models.Model):
     borrowerID = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='Loan_borrower')
     loanStatusID = models.ForeignKey(LoanStatus, on_delete=models.CASCADE, null=False, related_name='Loan_loanStatus')
     itemCategoryID = models.ForeignKey(ItemCategory, on_delete=models.CASCADE, null=False, related_name='ItemCategory')
+    image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
 
 class MoneyLoan(models.Model):

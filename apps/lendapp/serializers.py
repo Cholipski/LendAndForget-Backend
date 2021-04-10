@@ -29,7 +29,7 @@ class LoanSerializer(serializers.ModelSerializer):
         model = Loan
         fields = ['pk', 'url', 'name',
                   'description', 'startDate', 'endDate',
-                  'itemAmount', 'borrowerID', 'itemCategoryID']
+                  'itemAmount', 'borrowerID', 'itemCategoryID', 'image']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
