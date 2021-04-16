@@ -1,13 +1,12 @@
 import json
-
 import jwt
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.urls import reverse
 from rest_framework import generics, status
 from rest_framework.decorators import permission_classes
-from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.generics import GenericAPIView, get_object_or_404
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile
@@ -15,23 +14,13 @@ from .serializers import UserSerializer, UserProfileSerializer, MyTokenObtainPai
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .utils import Util
 from django.conf import settings
+from django.core import serializers
+from django.http import HttpResponse
 
 
 @permission_classes([AllowAny])
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-
-
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    name = 'user-list'
-
-
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    name = 'user-detail'
 
 
 class UserProfileList(generics.ListAPIView):
@@ -97,6 +86,29 @@ class VerifyEmail(generics.GenericAPIView):
             res['message'] = 'Invalid token'
             return JsonResponse(res)
 
+
+class UserManage(generics.GenericAPIView):
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user, many=False)
+
+        userprofile = UserProfile.objects.get(user_id=serializer.data['pk'])
+        serializer2 = UserProfileSerializer(userprofile, many=False)
+        response = serializer.data
+        response['phone'] = serializer2.data['phone_number']
+        return Response(response)
+
+    def delete(self, request):
+        res = {
+            'status': '',
+            'message': '',
+        }
+        user = User.objects.get(username=self.request.user)
+        user.delete()
+        res['status'] = 'success'
+        res['message'] = 'Successfully account deleted'
+
+        return JsonResponse(res)
 
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'

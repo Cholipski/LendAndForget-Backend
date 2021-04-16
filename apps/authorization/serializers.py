@@ -51,11 +51,11 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
-class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
+class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     class Meta:
         model = UserProfile
-        fields = ['url', 'pk', 'user', 'phone_number']
+        fields = ['pk', 'user', 'phone_number']
 
 
