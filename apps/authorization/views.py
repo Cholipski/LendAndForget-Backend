@@ -110,6 +110,28 @@ class UserManage(generics.GenericAPIView):
 
         return JsonResponse(res)
 
+    def put(self, request):
+        try:
+            user = request.user
+            serializer = UserSerializer(user, many=False)
+            userprofile = UserProfile.objects.get(user_id=serializer.data['pk'])
+            data = request.data
+
+            if data['first_name'] != '':
+                user.first_name = data['first_name']
+
+            if data['last_name'] != '':
+                user.last_name = data['last_name']
+
+            if data['phone'] != '':
+                userprofile.phone_number = data['phone']
+
+            user.save()
+            userprofile.save()
+            return Response({'status': 'data changed correctly'}, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({'status': 'something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
 
