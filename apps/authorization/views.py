@@ -60,8 +60,6 @@ class RegisterView(GenericAPIView):
             user.is_active = False
             user.save()
             token = RefreshToken.for_user(user)
-            relative_link = reverse('email-verify')
-
             url = 'http://localhost:3000/email-verify/' + str(token)
             email_body = "Hi " + user.username + '! \nUse link below to activate your account!. \n' + url
             data = {"to_email": user.email, "email_body": email_body, 'email_subject': 'Verify your email!'}
