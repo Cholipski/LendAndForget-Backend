@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.authorization',
     'apps.lendapp',
     'corsheaders',
+    'django_cleanup',
 ]
 
 MIDDLEWARE = [
