@@ -34,7 +34,7 @@ class MoneyLoan(models.Model):
     name = models.CharField(max_length=45, null=False)
     description = models.CharField(max_length=255, null=True)
     startDate = models.DateField(null=False)
-    endDate = models.DateField(null=True)
+    endDate = models.DateField(null=True, blank=True)
     amount = models.FloatField(null=False)
     loanStatusID = models.ForeignKey(LoanStatus, on_delete=models.CASCADE, null=False, related_name='MoneyLoan'
                                                                                                     '_loanStatus')
