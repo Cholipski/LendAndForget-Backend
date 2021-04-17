@@ -59,3 +59,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['pk', 'user', 'phone_number']
 
 
+class PasswordSerializer(serializers.Serializer):
+
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, max_length=65, min_length=8, write_only=True, style={'input_type': 'password'})
+    re_password = serializers.CharField(required=True, max_length=65, min_length=8, write_only=True, style={'input_type': 'password'})

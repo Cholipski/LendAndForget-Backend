@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile
-from .serializers import UserSerializer, UserProfileSerializer, MyTokenObtainPairSerializer
+from .serializers import UserSerializer, UserProfileSerializer, MyTokenObtainPairSerializer, PasswordSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .utils import Util
 from django.conf import settings
@@ -126,17 +126,33 @@ class UserManage(generics.GenericAPIView):
             if data['phone'] != '':
                 userprofile.phone_number = data['phone']
 
+            if data['old_password'] != '' or data['new_password'] != '' or data['re_password'] != '':
+                serializer_pass = PasswordSerializer(data=request.data)
+                if serializer_pass.is_valid():
+                    if not user.check_password(serializer_pass.data.get('old_password')):
+                        return Response({'status': ['Wrong old password.']},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    if data['new_password'] != data['re_password']:
+                        return Response({'status': ['Passwords must match!.']},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    user.set_password(serializer_pass.data.get('new_password'))
+
+            if (data['first_name'] == '' and data['last_name'] == ''
+                    and data['phone'] == '' and data['old_password'] ==''
+                    and data['new_password'] == '' and data['re_password'] == ''):
+                return Response({'status': ['Nothing was changed']},
+                                status=status.HTTP_200_OK)
+
             user.save()
             userprofile.save()
-            return Response({'status': 'data changed correctly'}, status=status.HTTP_200_OK)
+            return Response({'status': 'Data changed correctly'}, status=status.HTTP_200_OK)
         except Exception:
-            return Response({'status': 'something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
 
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
 
     def get(self, request, *args, **kwargs):
-        return Response({'users': reverse(UserList.name),
-                         'usersprofile': reverse(UserProfileList.name),
+        return Response({'usersprofile': reverse(UserProfileList.name),
                          'register': reverse(RegisterView.name),
                          })
