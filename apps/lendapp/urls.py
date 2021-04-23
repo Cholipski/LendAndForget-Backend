@@ -17,6 +17,9 @@ urlpatterns = [
     path('money-loan/', views.MoneyLoanList.as_view(), name=views.MoneyLoanList.name),
     path('money-loan/<int:pk>', views.MoneyLoanDetail.as_view(), name=views.MoneyLoanDetail.name),
 
+    path('contact/', views.ContactList.as_view(), name=views.ContactList.name),
+    path('contact/<int:pk>', views.ContactDetail.as_view(), name=views.ContactDetail.name),
+
     path('item-return/', views.ReturnLend.as_view(), name="Return a loan"),
     path('money-return/', views.ReturnMoneyLend.as_view(), name="Return money"),
 

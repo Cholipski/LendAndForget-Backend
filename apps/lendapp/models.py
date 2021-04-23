@@ -31,6 +31,13 @@ class Loan(models.Model):
                                          related_name='item_category')
     image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        try:
+            contact = Contact.objects.get(user_id=self.lender_id, friend_id=self.borrower_id)
+        except Contact.DoesNotExist:
+            Contact.objects.create(user_id=self.lender_id, friend_id=self.borrower_id)
+        super().save()
+
 
 class MoneyLoan(models.Model):
     name = models.CharField(max_length=45, null=False)
@@ -42,3 +49,16 @@ class MoneyLoan(models.Model):
                                                                                                     '_loanStatus')
     lender_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='money_loan_lender')
     borrower_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='money_loan_borrower')
+
+    def save(self, *args, **kwargs):
+        try:
+            contact = Contact.objects.get(user_id=self.lender_id, friend_id=self.borrower_id)
+        except Contact.DoesNotExist:
+            Contact.objects.create(user_id=self.lender_id, friend_id=self.borrower_id)
+        super().save()
+
+class Contact(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='contact_list_user_id')
+    friend_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='contact_list_friend_id')
+
+

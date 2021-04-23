@@ -1,8 +1,9 @@
 from rest_framework import generics, serializers, response, status
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
-from .models import ItemCategory, LoanStatus, Loan, MoneyLoan
-from .serializers import ItemCategorySerializer, LoanStatusSerializer, LoanSerializer, MoneyLoanSerializer
+from .models import ItemCategory, LoanStatus, Loan, MoneyLoan, Contact
+from .serializers import ItemCategorySerializer, LoanStatusSerializer, LoanSerializer, MoneyLoanSerializer, \
+    ContactSerializer
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 import json
@@ -166,5 +167,27 @@ class ReturnMoneyLend(generics.GenericAPIView):
             return JsonResponse(return_response)
         except Exception:
             return JsonResponse(return_response)
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Contact list
+
+
+
+class ContactList(generics.ListCreateAPIView):
+    serializer_class = ContactSerializer
+    name = 'contact-list'
+
+    def get_queryset(self):
+        qs = Contact.objects.filter(user_id=self.request.user)
+        return qs
+
+
+class ContactDetail(generics.RetrieveAPIView):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+    name = 'contact-detail'
 
 # ----------------------------------------------------------------------------------------------------------------------
