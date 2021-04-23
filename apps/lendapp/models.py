@@ -39,6 +39,14 @@ class MoneyLoan(models.Model):
     end_date = models.DateField(null=True, blank=True)
     amount = models.FloatField(null=False)
     loan_status_id = models.ForeignKey(LoanStatus, on_delete=models.CASCADE, null=False, related_name='money_loan'
-                                                                                                    '_loanStatus')
+                                                                                                      '_loanStatus')
     lender_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='money_loan_lender')
     borrower_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='money_loan_borrower')
+
+
+class Notification(models.Model):
+    title = models.CharField(max_length=45, null=False)
+    description = models.CharField(max_length=255, null=False)
+    is_seen = models.BooleanField(null=False)
+    show_date = models.DateField(null=False)
+    receiver_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='notification_receiver')

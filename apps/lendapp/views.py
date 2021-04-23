@@ -1,8 +1,11 @@
+import datetime
+
 from rest_framework import generics, serializers, response, status
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
-from .models import ItemCategory, LoanStatus, Loan, MoneyLoan
-from .serializers import ItemCategorySerializer, LoanStatusSerializer, LoanSerializer, MoneyLoanSerializer
+from .models import ItemCategory, LoanStatus, Loan, MoneyLoan, Notification
+from .serializers import ItemCategorySerializer, LoanStatusSerializer, LoanSerializer, MoneyLoanSerializer, \
+    NotificationSerializer
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 import json
@@ -168,3 +171,46 @@ class ReturnMoneyLend(generics.GenericAPIView):
             return JsonResponse(return_response)
 
 # ----------------------------------------------------------------------------------------------------------------------
+
+
+class NotificationList(generics.ListCreateAPIView):
+    serializer_class = NotificationSerializer
+    name = 'notification-list'
+    permission_classes = [IsAuthenticated]
+    receiver_id = serializers.PrimaryKeyRelatedField(
+        read_only=True,
+    )
+
+    def perform_create(self, serializer):
+        serializer.save(receiver_id=self.request.user, is_seen=False)
+
+    def get_queryset(self):
+        qs = Notification.objects.filter(receiver_id=self.request.user, show_date__lte=datetime.date.today())
+        return qs
+
+
+class NotificationDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Loan.objects.all()
+    serializer_class = NotificationSerializer
+    name = 'notification-detail'
+
+    def destroy(self, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object())
+        super().destroy(*args, **kwargs)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SetAsSeen(generics.GenericAPIView):
+    def post(self, request):
+        return_response = {
+            'status': 403,
+        }
+        try:
+            notification_id = json.loads(request.body)
+            notification = Notification.objects.get(id=notification_id)
+            notification.is_seen = True
+            notification.save()
+            return_response['status'] = 200
+            return JsonResponse(return_response)
+        except Exception:
+            return JsonResponse(return_response)
