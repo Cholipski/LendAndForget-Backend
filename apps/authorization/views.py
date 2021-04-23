@@ -1,5 +1,4 @@
 import json
-
 import jwt
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -11,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile
-from .serializers import UserSerializer, UserProfileSerializer, MyTokenObtainPairSerializer
+from .serializers import UserSerializer, UserProfileSerializer, MyTokenObtainPairSerializer, PasswordSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .utils import Util
 from django.conf import settings
@@ -20,18 +19,6 @@ from django.conf import settings
 @permission_classes([AllowAny])
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-
-
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    name = 'user-list'
-
-
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    name = 'user-detail'
 
 
 class UserProfileList(generics.ListAPIView):
@@ -60,9 +47,7 @@ class RegisterView(GenericAPIView):
             user.is_active = False
             user.save()
             token = RefreshToken.for_user(user)
-            relative_link = reverse('email-verify')
-
-            url = 'http://localhost:3000' + relative_link + "/" + str(token)
+            url = 'http://localhost:3000/email-verify/' + str(token)
             email_body = "Hi " + user.username + '! \nUse link below to activate your account!. \n' + url
             data = {"to_email": user.email, "email_body": email_body, 'email_subject': 'Verify your email!'}
             Util.send_activation_email(data)
@@ -100,11 +85,71 @@ class VerifyEmail(generics.GenericAPIView):
             return JsonResponse(res)
 
 
+class UserManage(generics.GenericAPIView):
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user, many=False)
+
+        userprofile = UserProfile.objects.get(user_id=serializer.data['pk'])
+        serializer2 = UserProfileSerializer(userprofile, many=False)
+        response = serializer.data
+        response['phone'] = serializer2.data['phone_number']
+        return Response(response)
+
+    def delete(self, request):
+        res = {
+            'status': '',
+            'message': '',
+        }
+        user = User.objects.get(username=self.request.user)
+        user.delete()
+        res['status'] = 'success'
+        res['message'] = 'Successfully account deleted'
+
+        return JsonResponse(res)
+
+    def put(self, request):
+        try:
+            user = request.user
+            serializer = UserSerializer(user, many=False)
+            userprofile = UserProfile.objects.get(user_id=serializer.data['pk'])
+            data = request.data
+
+            if data['first_name'] != '':
+                user.first_name = data['first_name']
+
+            if data['last_name'] != '':
+                user.last_name = data['last_name']
+
+            if data['phone'] != '':
+                userprofile.phone_number = data['phone']
+
+            if data['old_password'] != '' or data['new_password'] != '' or data['re_password'] != '':
+                serializer_pass = PasswordSerializer(data=request.data)
+                if serializer_pass.is_valid():
+                    if not user.check_password(serializer_pass.data.get('old_password')):
+                        return Response({'status': ['Wrong old password.']},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    if data['new_password'] != data['re_password']:
+                        return Response({'status': ['Passwords must match!.']},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    user.set_password(data['new_password'])
+
+            if (data['first_name'] == '' and data['last_name'] == ''
+                    and data['phone'] == '' and data['old_password'] ==''
+                    and data['new_password'] == '' and data['re_password'] == ''):
+                return Response({'status': ['Nothing was changed']},
+                                status=status.HTTP_200_OK)
+            user.save()
+            userprofile.save()
+            return Response({'status': 'Data changed successfully'}, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({'status': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
 
     def get(self, request, *args, **kwargs):
-        return Response({'users': reverse(UserList.name),
-                         'usersprofile': reverse(UserProfileList.name),
+        return Response({'usersprofile': reverse(UserProfileList.name),
                          'register': reverse(RegisterView.name),
                          })

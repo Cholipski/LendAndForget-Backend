@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'apps.authorization',
+    'apps.lendapp',
     'corsheaders',
+    'django_cleanup',
 ]
 
 MIDDLEWARE = [
@@ -84,8 +86,8 @@ WSGI_APPLICATION = 'lend_and_forget.wsgi.application'
 # Token settings
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=2),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=20),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -117,13 +119,27 @@ SIMPLE_JWT = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '00436236_lend_and_forget',
-        'USER': '00436236_lend_and_forget',
+        'NAME': '00436236_lend_and_forget_2',
+        'USER': '00436236_lend_and_forget_2',
         'PASSWORD': 'NvHGsu3O',
         'HOST': 'hosting2049919.online.pro',
         'PORT': '5432'
     }
 }
+
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': '00436236_lendapp',
+#        'USER': '00436236_lendapp',
+#        'PASSWORD': 'NvHGsu30',
+#        'HOST': 'hosting2049919.online.pro',
+#        'PORT': '3306',
+#        'OPTIONS': {
+#                    'charset': 'latin2',
+#                    'use_unicode': True, },
+#    }
+# }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -149,6 +165,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -168,6 +187,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'Backend')
 
 
 # Cors Settings

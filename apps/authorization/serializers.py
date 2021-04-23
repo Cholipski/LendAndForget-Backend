@@ -51,9 +51,16 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
-class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
+class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     class Meta:
         model = UserProfile
-        fields = ['url', 'pk', 'user', 'phone_number']
+        fields = ['pk', 'user', 'phone_number']
+
+
+class PasswordSerializer(serializers.Serializer):
+
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, max_length=65, min_length=8, write_only=True, style={'input_type': 'password'})
+    re_password = serializers.CharField(required=True, max_length=65, min_length=8, write_only=True, style={'input_type': 'password'})
