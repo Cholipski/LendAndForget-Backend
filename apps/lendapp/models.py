@@ -4,39 +4,41 @@ from .utils import *
 
 
 class ItemCategory(models.Model):
-    categoryName = models.CharField(max_length=20, null=False)
+    category_name = models.CharField(max_length=20, null=False)
 
     def __str__(self):
-        return self.categoryName
+        return self.category_name
 
 
 class LoanStatus(models.Model):
-    statusName = models.CharField(max_length=15, null=False)
+    status_name = models.CharField(max_length=15, null=False)
 
     def __str__(self):
-        return self.statusName
+        return self.status_name
 
 
 class Loan(models.Model):
     name = models.CharField(max_length=45, null=False)
     description = models.CharField(max_length=255, null=True)
-    startDate = models.DateField(null=False)
-    endDate = models.DateField(null=True, blank=True)
-    itemAmount = models.IntegerField(null=False)
-    lenderID = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='Loan_lender')
-    borrowerID = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='Loan_borrower')
-    loanStatusID = models.ForeignKey(LoanStatus, on_delete=models.CASCADE, null=False, related_name='Loan_loanStatus')
-    itemCategoryID = models.ForeignKey(ItemCategory, on_delete=models.CASCADE, null=False, related_name='ItemCategory')
+    start_date = models.DateField(null=False)
+    end_date = models.DateField(null=True, blank=True)
+    item_amount = models.IntegerField(null=False)
+    lender_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='loan_lender')
+    borrower_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='loan_borrower')
+    loan_status_id = models.ForeignKey(LoanStatus, on_delete=models.CASCADE, null=False,
+                                       related_name='loan_loan_status')
+    item_category_id = models.ForeignKey(ItemCategory, on_delete=models.CASCADE, null=False,
+                                         related_name='item_category')
     image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
 
 class MoneyLoan(models.Model):
     name = models.CharField(max_length=45, null=False)
     description = models.CharField(max_length=255, null=True)
-    startDate = models.DateField(null=False)
-    endDate = models.DateField(null=True, blank=True)
+    start_date = models.DateField(null=False)
+    end_date = models.DateField(null=True, blank=True)
     amount = models.FloatField(null=False)
-    loanStatusID = models.ForeignKey(LoanStatus, on_delete=models.CASCADE, null=False, related_name='MoneyLoan'
+    loan_status_id = models.ForeignKey(LoanStatus, on_delete=models.CASCADE, null=False, related_name='money_loan'
                                                                                                     '_loanStatus')
-    lenderID = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='MoneyLoan_lender')
-    borrowerID = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='MoneyLoan_borrower')
+    lender_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='money_loan_lender')
+    borrower_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='money_loan_borrower')

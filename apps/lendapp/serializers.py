@@ -7,18 +7,18 @@ from .models import ItemCategory, LoanStatus, Loan, MoneyLoan
 class ItemCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemCategory
-        fields = ['pk', 'url', 'categoryName']
+        fields = ['pk', 'url', 'category_name']
 
 
 class LoanStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoanStatus
-        fields = ['pk', 'url', 'statusName']
+        fields = ['pk', 'url', 'status_name']
 
 
 class LoanSerializer(serializers.ModelSerializer):
-    borrowerID = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='email')
-    itemCategoryID = serializers.SlugRelatedField(queryset=ItemCategory.objects.all(), slug_field='id')
+    borrower_id = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='email')
+    item_category_id = serializers.SlugRelatedField(queryset=ItemCategory.objects.all(), slug_field='id')
 
     def _user(self):
         request = self.context.get('request', None)
@@ -27,39 +27,39 @@ class LoanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Loan
-        fields = ['pk', 'url', 'name', 'description', 'startDate', 'endDate', 'itemAmount', 'borrowerID',
-                  'itemCategoryID', 'image']
+        fields = ['pk', 'url', 'name', 'description', 'start_date', 'end_date', 'item_amount', 'borrower_id',
+                  'item_category_id', 'image']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['itemCategoryID'] = instance.itemCategoryID.categoryName
-        response['loanStatusID'] = instance.loanStatusID.statusName
-        response['borrowerID'] = instance.borrowerID.username
-        response['lenderID'] = instance.lenderID.username
+        response['item_category_id'] = instance.item_category_id.category_name
+        response['loan_status_id'] = instance.loan_status_id.status_name
+        response['borrower_id'] = instance.borrower_id.username
+        response['lender_id'] = instance.lender_id.username
 
         return response
 
     def validate(self, attrs):
-        start_date = attrs.get('startDate', '')
-        end_date = attrs.get('endDate', '')
+        start_date = attrs.get('start_date', '')
+        end_date = attrs.get('end_date', '')
         if end_date:
             if start_date and end_date < start_date:
-                raise serializers.ValidationError({'endDate': 'The end date cannot precede the start date'})
+                raise serializers.ValidationError({'end_date': 'The end date cannot precede the start date'})
             if end_date < datetime.date.today():
-                raise serializers.ValidationError({'endDate': 'The end date cannot be earlier than today'})
+                raise serializers.ValidationError({'end_date': 'The end date cannot be earlier than today'})
         return super().validate(attrs)
 
     def update(self, instance, validated_data):
-        validated_data["startDate"] = instance.startDate
-        validated_data["borrowerID"] = instance.borrowerID
-        validated_data["itemCategoryID"] = instance.itemCategoryID
+        validated_data["start_date"] = instance.start_date
+        validated_data["borrower_id"] = instance.borrower_id
+        validated_data["item_category_id"] = instance.item_category_id
         instance = super(LoanSerializer, self).update(instance, validated_data)
 
         return instance
 
 
 class MoneyLoanSerializer(serializers.ModelSerializer):
-    borrowerID = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='email')
+    borrower_id = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='email')
 
     def _user(self):
         request = self.context.get('request', None)
@@ -68,29 +68,29 @@ class MoneyLoanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MoneyLoan
-        fields = ['pk', 'url', 'name', 'description', 'startDate', 'endDate', 'amount', 'borrowerID']
+        fields = ['pk', 'url', 'name', 'description', 'start_date', 'end_date', 'amount', 'borrower_id']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['loanStatusID'] = instance.loanStatusID.statusName
-        response['borrowerID'] = instance.borrowerID.username
-        response['lenderID'] = instance.lenderID.username
+        response['loan_status_id'] = instance.loan_status_id.status_name
+        response['borrower_id'] = instance.borrower_id.username
+        response['lender_id'] = instance.lender_id.username
 
         return response
 
     def validate(self, attrs):
-        start_date = attrs.get('startDate', '')
-        end_date = attrs.get('endDate', '')
+        start_date = attrs.get('start_date', '')
+        end_date = attrs.get('end_date', '')
         if end_date:
             if start_date and end_date < start_date:
-                raise serializers.ValidationError({'endDate': 'The end date cannot precede the start date'})
+                raise serializers.ValidationError({'end_date': 'The end date cannot precede the start date'})
             if end_date < datetime.date.today():
-                raise serializers.ValidationError({'endDate': 'The end date cannot be earlier than today'})
+                raise serializers.ValidationError({'end_date': 'The end date cannot be earlier than today'})
         return super().validate(attrs)
 
     def update(self, instance, validated_data):
-        validated_data["startDate"] = instance.startDate
-        validated_data["borrowerID"] = instance.borrowerID
+        validated_data["start_date"] = instance.start_date
+        validated_data["borrower_id"] = instance.borrower_id
         validated_data["amount"] = instance.amount
         instance = super(MoneyLoanSerializer, self).update(instance, validated_data)
 

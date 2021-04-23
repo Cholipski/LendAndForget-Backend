@@ -119,8 +119,8 @@ SIMPLE_JWT = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '00436236_lend_and_forget',
-        'USER': '00436236_lend_and_forget',
+        'NAME': '00436236_lend_and_forget_2',
+        'USER': '00436236_lend_and_forget_2',
         'PASSWORD': 'NvHGsu3O',
         'HOST': 'hosting2049919.online.pro',
         'PORT': '5432'
@@ -165,6 +165,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/

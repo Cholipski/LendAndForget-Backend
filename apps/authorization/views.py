@@ -5,8 +5,8 @@ from django.http import JsonResponse
 from django.urls import reverse
 from rest_framework import generics, status
 from rest_framework.decorators import permission_classes
-from rest_framework.generics import GenericAPIView, get_object_or_404
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile
@@ -14,8 +14,6 @@ from .serializers import UserSerializer, UserProfileSerializer, MyTokenObtainPai
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .utils import Util
 from django.conf import settings
-from django.core import serializers
-from django.http import HttpResponse
 
 
 @permission_classes([AllowAny])
@@ -135,17 +133,16 @@ class UserManage(generics.GenericAPIView):
                     if data['new_password'] != data['re_password']:
                         return Response({'status': ['Passwords must match!.']},
                                         status=status.HTTP_400_BAD_REQUEST)
-                    user.set_password(serializer_pass.data.get('new_password'))
+                    user.set_password(data['new_password'])
 
             if (data['first_name'] == '' and data['last_name'] == ''
                     and data['phone'] == '' and data['old_password'] ==''
                     and data['new_password'] == '' and data['re_password'] == ''):
                 return Response({'status': ['Nothing was changed']},
                                 status=status.HTTP_200_OK)
-
             user.save()
             userprofile.save()
-            return Response({'status': 'Data changed correctly'}, status=status.HTTP_200_OK)
+            return Response({'status': 'Data changed successfully'}, status=status.HTTP_200_OK)
         except Exception:
             return Response({'status': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
 
