@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from .utils import *
+import datetime
 
 
 class ItemCategory(models.Model):
@@ -38,6 +39,12 @@ class Loan(models.Model):
             Contact.objects.create(user_id=self.lender_id, friend_id=self.borrower_id)
         super().save()
 
+    def create_notification(self):
+        description = self.lender_id.username + " dokonał zmian w wypożyczeniu " + self.name
+        url = "localhost:3000/loan-items/" + str(self.pk)
+        Notification.objects.create(title="Edycja wypożyczenia", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
 
 class MoneyLoan(models.Model):
     name = models.CharField(max_length=45, null=False)
@@ -57,6 +64,12 @@ class MoneyLoan(models.Model):
             Contact.objects.create(user_id=self.lender_id, friend_id=self.borrower_id)
         super().save()
 
+    def create_notification(self):
+        description = self.lender_id.username + " dokonał zmian w pożyczce " + self.name
+        url = "localhost:3000/loan-money/" + str(self.pk)
+        Notification.objects.create(title="Edycja wypożyczenia", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
 class Contact(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='contact_list_user_id')
     friend_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='contact_list_friend_id')
@@ -68,3 +81,4 @@ class Notification(models.Model):
     is_seen = models.BooleanField(null=False)
     show_date = models.DateField(null=False)
     receiver_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='notification_receiver')
+    frontend_url = models.URLField(null=True)
