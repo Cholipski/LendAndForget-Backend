@@ -1,7 +1,7 @@
 import datetime
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import ItemCategory, LoanStatus, Loan, MoneyLoan, Notification
+from .models import ItemCategory, LoanStatus, Loan, MoneyLoan, Notification, Contact
 
 
 class ItemCategorySerializer(serializers.ModelSerializer):
@@ -14,6 +14,20 @@ class LoanStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoanStatus
         fields = ['pk', 'url', 'status_name']
+
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = ['pk', 'user_id', 'friend_id']
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['friend_first_name'] = instance.friend_id.first_name
+        response['firend_last_name'] = instance.friend_id.last_name
+        response['firend_email'] = instance.friend_id.email
+
+        return response
 
 
 class LoanSerializer(serializers.ModelSerializer):
