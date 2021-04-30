@@ -1,7 +1,7 @@
 import datetime
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import ItemCategory, LoanStatus, Loan, MoneyLoan, Contact
+from .models import ItemCategory, LoanStatus, Loan, MoneyLoan, Notification, Contact
 
 
 class ItemCategorySerializer(serializers.ModelSerializer):
@@ -109,3 +109,17 @@ class MoneyLoanSerializer(serializers.ModelSerializer):
         instance = super(MoneyLoanSerializer, self).update(instance, validated_data)
 
         return instance
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    receiver_id = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='id')
+
+    def _user(self):
+        request = self.context.get('request', None)
+        if request:
+            return request.User
+
+    class Meta:
+        model = Notification
+        fields = ['pk', 'url', 'title', 'description', 'is_seen', 'show_date', 'receiver_id']
+
