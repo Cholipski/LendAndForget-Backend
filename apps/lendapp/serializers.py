@@ -24,8 +24,8 @@ class ContactSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['friend_first_name'] = instance.friend_id.first_name
-        response['firend_last_name'] = instance.friend_id.last_name
-        response['firend_email'] = instance.friend_id.email
+        response['friend_last_name'] = instance.friend_id.last_name
+        response['friend_email'] = instance.friend_id.email
 
         return response
 
