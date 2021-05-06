@@ -214,6 +214,27 @@ class SetAsSeen(generics.GenericAPIView):
             return JsonResponse(return_response)
         except Exception:
             return JsonResponse(return_response)
+
+class DeleteNotification(generics.GenericAPIView):
+    def delete(self, request):
+        try:
+            notification = Notification.objects.get(id=request.data['id'], receiver_id_id=self.request.user)
+            notification.delete()
+            return response.Response("Successfully notification deleted", status=status.HTTP_200_OK)
+        except:
+            return response.Response("Notification not found", status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class DeleteAllNotification(generics.GenericAPIView):
+    def delete(self, request):
+        try:
+            notification = Notification.objects.filter(receiver_id_id=self.request.user)
+            notification.delete()
+            return response.Response("Successfully all notification deleted", status=status.HTTP_200_OK)
+        except:
+            return response.Response("No notifications were found for this user", status=status.HTTP_400_BAD_REQUEST)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Contact list
 
@@ -227,10 +248,20 @@ class ContactList(generics.ListCreateAPIView):
         qs = Contact.objects.filter(user_id=self.request.user)
         return qs
 
+    def delete(self, request):
+        try:
+            friend = Contact.objects.get(id=request.data['id'], user_id_id=self.request.user)
+            friend.delete()
+            return response.Response("Successfully friend deleted", status=status.HTTP_200_OK)
+        except:
+            return response.Response("Friend not found", status=status.HTTP_400_BAD_REQUEST)
+
 
 class ContactDetail(generics.RetrieveAPIView):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
     name = 'contact-detail'
+
+
 
 # ----------------------------------------------------------------------------------------------------------------------

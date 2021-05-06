@@ -18,6 +18,8 @@ urlpatterns = [
     path('money-loan/<int:pk>', views.MoneyLoanDetail.as_view(), name=views.MoneyLoanDetail.name),
 
     path('notifications/', views.NotificationList.as_view(), name=views.NotificationList.name),
+    path('delete-notifications/', views.DeleteNotification.as_view(), name="delete notification"),
+    path('delete-all-notifications/', views.DeleteAllNotification.as_view(), name="delete all notification"),
     path('notifications/<int:pk>', views.NotificationDetail.as_view(), name=views.NotificationDetail.name),
 
     path('contact/', views.ContactList.as_view(), name=views.ContactList.name),
