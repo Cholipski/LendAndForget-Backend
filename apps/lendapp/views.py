@@ -200,9 +200,9 @@ class RequestLongerMoneyReturnTime(generics.GenericAPIView):
             'status': 403,
         }
         try:
-            lend_id = json.loads(request.body)
-            loan = MoneyLoan.objects.get(id=lend_id)
-            loan.create_notification_ask_for_longer_return(request.body.date)
+            data = json.loads(request.body)
+            loan = MoneyLoan.objects.get(id=data['id'])
+            loan.create_notification_ask_for_longer_return(data['date'])
             return_response['status'] = 200
             return JsonResponse(return_response)
         except Exception:
@@ -215,9 +215,9 @@ class RequestEarlierMoneyReturn(generics.GenericAPIView):
             'status': 403,
         }
         try:
-            lend_id = json.loads(request.body)
-            loan = MoneyLoan.objects.get(id=lend_id)
-            loan.create_notification_ask_for_return(request.body.date)
+            data = json.loads(request.body)
+            loan = MoneyLoan.objects.get(id=data['id'])
+            loan.create_notification_ask_for_return(data['date'])
             return_response['status'] = 200
             return JsonResponse(return_response)
         except Exception:
@@ -230,9 +230,9 @@ class SetMoneyNotification(generics.GenericAPIView):
             'status': 403,
         }
         try:
-            lend_id = json.loads(request.body)
-            loan = MoneyLoan.objects.get(id=lend_id)
-            loan.create_notification(request.body.date)
+            data = json.loads(request.body)
+            loan = MoneyLoan.objects.get(id=data['id'])
+            loan.create_notification(data['date'])
             return_response['status'] = 200
             return JsonResponse(return_response)
         except Exception:
@@ -245,9 +245,9 @@ class RequestLongerItemReturnTime(generics.GenericAPIView):
             'status': 403,
         }
         try:
-            lend_id = json.loads(request.body)
-            loan = Loan.objects.get(id=lend_id)
-            loan.create_notification_ask_for_longer_return(request.body.date)
+            data = json.loads(request.body)
+            loan = Loan.objects.get(id=data['id'])
+            loan.create_notification_ask_for_longer_return(data['date'])
             return_response['status'] = 200
             return JsonResponse(return_response)
         except Exception:
@@ -260,9 +260,9 @@ class RequestEarlierItemReturn(generics.GenericAPIView):
             'status': 403,
         }
         try:
-            lend_id = json.loads(request.body)
-            loan = Loan.objects.get(id=lend_id)
-            loan.create_notification_ask_for_return(request.body.date)
+            data = json.loads(request.body)
+            loan = Loan.objects.get(id=data['id'])
+            loan.create_notification_ask_for_return(data['date'])
             return_response['status'] = 200
             return JsonResponse(return_response)
         except Exception:
@@ -275,9 +275,9 @@ class SetItemNotification(generics.GenericAPIView):
             'status': 403,
         }
         try:
-            lend_id = json.loads(request.body)
-            loan = Loan.objects.get(id=lend_id)
-            loan.create_notification(request.body.date)
+            data = json.loads(request.body)
+            loan = Loan.objects.get(id=data['id'])
+            loan.create_notification(data['date'])
             return_response['status'] = 200
             return JsonResponse(return_response)
         except Exception:
