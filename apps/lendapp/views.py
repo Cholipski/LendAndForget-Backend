@@ -215,6 +215,20 @@ class SetAsSeen(generics.GenericAPIView):
         except Exception:
             return JsonResponse(return_response)
 
+
+class SetAllAsSeen(generics.GenericAPIView):
+    def post(self, request):
+        try:
+            notification = Notification.objects.filter(receiver_id_id=self.request.user,
+                                                       show_date__lte=datetime.date.today())
+            for i in notification:
+                i.is_seen = True
+                i.save()
+            return response.Response("Successfully set all notification as seen", status=status.HTTP_200_OK)
+        except:
+            return response.Response("Notification not found", status=status.HTTP_400_BAD_REQUEST)
+
+
 class DeleteNotification(generics.GenericAPIView):
     def delete(self, request):
         try:
@@ -229,7 +243,8 @@ class DeleteNotification(generics.GenericAPIView):
 class DeleteAllNotification(generics.GenericAPIView):
     def delete(self, request):
         try:
-            notification = Notification.objects.filter(receiver_id_id=self.request.user)
+            notification = Notification.objects.filter(receiver_id_id=self.request.user,
+                                                       show_date__lte=datetime.date.today())
             notification.delete()
             return response.Response("Successfully all notification deleted", status=status.HTTP_200_OK)
         except:

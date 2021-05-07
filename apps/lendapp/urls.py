@@ -20,6 +20,7 @@ urlpatterns = [
     path('notifications/', views.NotificationList.as_view(), name=views.NotificationList.name),
     path('delete-notifications/', views.DeleteNotification.as_view(), name="delete notification"),
     path('delete-all-notifications/', views.DeleteAllNotification.as_view(), name="delete all notification"),
+    path('all-notifications-mark-seen/', views.SetAllAsSeen.as_view(), name="Mark all notification as seen"),
     path('notifications/<int:pk>', views.NotificationDetail.as_view(), name=views.NotificationDetail.name),
 
     path('contact/', views.ContactList.as_view(), name=views.ContactList.name),
