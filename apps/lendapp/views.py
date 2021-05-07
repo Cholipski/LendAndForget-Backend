@@ -1,5 +1,4 @@
 import datetime
-
 from rest_framework import generics, serializers, response, status
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
@@ -11,9 +10,7 @@ from rest_framework.response import Response
 import json
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Categories
-
+# <editor-fold desc="Categories">
 class ItemCategoryList(generics.ListCreateAPIView):
     queryset = ItemCategory.objects.all()
     serializer_class = ItemCategorySerializer
@@ -26,12 +23,10 @@ class ItemCategoryDetail(generics.RetrieveAPIView):
     name = 'itemcategory-detail'
 
 
-# ----------------------------------------------------------------------------------------------------------------------
+# </editor-fold>
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Statuses
-
+# <editor-fold desc="Statuses">
 class LoanStatusList(generics.ListCreateAPIView):
     queryset = LoanStatus.objects.all()
     serializer_class = LoanStatusSerializer
@@ -44,7 +39,7 @@ class LoanStatusDetail(generics.RetrieveAPIView):
     name = 'loan-status-detail'
 
 
-# ----------------------------------------------------------------------------------------------------------------------
+# </editor-fold>
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,6 +67,7 @@ class LoanDetail(generics.RetrieveUpdateDestroyAPIView):
     name = 'loan-detail'
 
     def destroy(self, *args, **kwargs):
+        self.get_object().create_notification_on_delete()
         serializer = self.get_serializer(self.get_object())
         super().destroy(*args, **kwargs)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
@@ -106,6 +102,7 @@ class MoneyLoanDetail(generics.RetrieveUpdateDestroyAPIView):
     name = 'moneyloan-detail'
 
     def destroy(self, *args, **kwargs):
+        self.get_object().create_notification_on_delete()
         serializer = self.get_serializer(self.get_object())
         super().destroy(*args, **kwargs)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
@@ -142,6 +139,7 @@ class ReturnLend(generics.GenericAPIView):
             lend_id = json.loads(request.body)
             loan = Loan.objects.get(id=lend_id)
             loan.loan_status_id_id = 2
+            loan.create_notification_on_return()
             loan.save()
             return_response['status'] = 200
             return JsonResponse(return_response)
@@ -164,11 +162,13 @@ class ReturnMoneyLend(generics.GenericAPIView):
             lend_id = json.loads(request.body)
             loan = MoneyLoan.objects.get(id=lend_id)
             loan.loan_status_id_id = 2
+            loan.create_notification_on_return()
             loan.save()
             return_response['status'] = 200
             return JsonResponse(return_response)
         except Exception:
             return JsonResponse(return_response)
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -177,12 +177,6 @@ class NotificationList(generics.ListCreateAPIView):
     serializer_class = NotificationSerializer
     name = 'notification-list'
     permission_classes = [IsAuthenticated]
-    receiver_id = serializers.PrimaryKeyRelatedField(
-        read_only=True,
-    )
-
-    def perform_create(self, serializer):
-        serializer.save(receiver_id=self.request.user, is_seen=False)
 
     def get_queryset(self):
         qs = Notification.objects.filter(receiver_id=self.request.user, show_date__lte=datetime.date.today())
@@ -198,6 +192,51 @@ class NotificationDetail(generics.RetrieveUpdateDestroyAPIView):
         serializer = self.get_serializer(self.get_object())
         super().destroy(*args, **kwargs)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class RequestLongerReturnTime(generics.GenericAPIView):
+    def post(self, request):
+        return_response = {
+            'status': 403,
+        }
+        try:
+            lend_id = json.loads(request.body)
+            loan = MoneyLoan.objects.get(id=lend_id)
+            loan.create_notification_ask_for_longer_return(request.body.date)
+            return_response['status'] = 200
+            return JsonResponse(return_response)
+        except Exception:
+            return JsonResponse(return_response)
+
+
+class RequestEarlierReturn(generics.GenericAPIView):
+    def post(self, request):
+        return_response = {
+            'status': 403,
+        }
+        try:
+            lend_id = json.loads(request.body)
+            loan = MoneyLoan.objects.get(id=lend_id)
+            loan.create_notification_ask_for_return(request.body.date)
+            return_response['status'] = 200
+            return JsonResponse(return_response)
+        except Exception:
+            return JsonResponse(return_response)
+
+
+class SetNotification(generics.GenericAPIView):
+    def post(self, request):
+        return_response = {
+            'status': 403,
+        }
+        try:
+            lend_id = json.loads(request.body)
+            loan = MoneyLoan.objects.get(id=lend_id)
+            loan.create_notification(request.body.date)
+            return_response['status'] = 200
+            return JsonResponse(return_response)
+        except Exception:
+            return JsonResponse(return_response)
 
 
 class SetAsSeen(generics.GenericAPIView):
@@ -236,10 +275,9 @@ class DeleteNotification(generics.GenericAPIView):
             notification = Notification.objects.get(id=notification_id , receiver_id_id=self.request.user)
             notification.delete()
             return response.Response("Successfully notification deleted", status=status.HTTP_200_OK)
-        except:
+
+        except Exception:
             return response.Response("Notification not found", status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class DeleteAllNotification(generics.GenericAPIView):
     def delete(self, request):
@@ -249,12 +287,12 @@ class DeleteAllNotification(generics.GenericAPIView):
                                                        show_date__lte=datetime.date.today())
             notification.delete()
             return response.Response("Successfully all notification deleted", status=status.HTTP_200_OK)
-        except:
+
+        except Exception:
             return response.Response("No notifications were found for this user", status=status.HTTP_400_BAD_REQUEST)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Contact list
-
 
 
 class ContactList(generics.ListCreateAPIView):
@@ -271,7 +309,7 @@ class ContactList(generics.ListCreateAPIView):
             friend = Contact.objects.get(id=friend_id, user_id_id=self.request.user)
             friend.delete()
             return response.Response("Successfully friend deleted", status=status.HTTP_200_OK)
-        except:
+        except Exception:
             return response.Response("Friend not found", status=status.HTTP_400_BAD_REQUEST)
 
 

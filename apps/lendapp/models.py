@@ -33,17 +33,58 @@ class Loan(models.Model):
     image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        if self._state.adding is True:
+            self.create_notification_on_create()
         try:
-            contact = Contact.objects.get(user_id=self.lender_id, friend_id=self.borrower_id)
+            _ = Contact.objects.get(user_id=self.lender_id, friend_id=self.borrower_id)
         except Contact.DoesNotExist:
             Contact.objects.create(user_id=self.lender_id, friend_id=self.borrower_id)
         super().save()
 
-    def create_notification(self):
-        description = self.lender_id.username + " dokonał zmian w wypożyczeniu " + self.name
+    def create_notification(self, date):
+        description = "Zbliża się termin zwrotu wypożyczenia \"" + self.name + "\"."
+        url = "localhost:3000/loan-items/" + str(self.pk)
+        Notification.objects.create(title="Przypomnienie o upływającym terminie", description=description,
+                                    is_seen=False, show_date=date, receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_on_update(self):
+        description = "Użytkownik " + self.lender_id.username + " dokonał zmian w wypożyczeniu \"" + self.name + "\"."
         url = "localhost:3000/loan-items/" + str(self.pk)
         Notification.objects.create(title="Edycja wypożyczenia", description=description, is_seen=False,
                                     show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_on_create(self):
+        description = "Użytkownik " + self.lender_id.username + " utworzył wypożyczenie \"" + self.name + "\"."
+        url = "localhost:3000/loan-items/" + str(self.pk)
+        Notification.objects.create(title="Dodanie wypożyczenia", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_on_delete(self):
+        description = "Użytkownik " + self.lender_id.username + " usunął wypożyczenie \"" + self.name + "\"."
+        url = "localhost:3000/loan-items/"
+        Notification.objects.create(title="Usunięcie wypożyczenia", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_on_return(self):
+        description = "Użytkownik " + self.lender_id.username + " przyjął zwrot wypożyczenia \"" + self.name + "\"."
+        url = "localhost:3000/loan-items/" + str(self.pk)
+        Notification.objects.create(title="Zwrot wypożyczenia", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_ask_for_return(self, date):
+        description = "Użytkownik " + self.lender_id.username + " prosi o szybszy zwrot wypożyczenia \"" + self.name + \
+                      "\". Proponowany termin: " + date
+        url = "localhost:3000/loan-items/" + str(self.pk)
+        Notification.objects.create(title="Prośba o szybszy zwrot wypożyczenia", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_ask_for_longer_return(self, date):
+        description = "Użytkownik " + self.lender_id.username + " prosi o wydłużenie terminu zwrotu wypożyczenia \"" + \
+                      self.name + "\". Proponowany termin: " + date
+        url = "localhost:3000/loan-items/" + str(self.pk)
+        Notification.objects.create(title="Prośba o wydłużenie terminu zwrotu wypożyczenia", description=description,
+                                    is_seen=False, show_date=datetime.date.today(), receiver_id=self.lender_id,
+                                    frontend_url=url)
 
 
 class MoneyLoan(models.Model):
@@ -58,17 +99,59 @@ class MoneyLoan(models.Model):
     borrower_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='money_loan_borrower')
 
     def save(self, *args, **kwargs):
+        if self._state.adding is True:
+            self.create_notification_on_create()
         try:
-            contact = Contact.objects.get(user_id=self.lender_id, friend_id=self.borrower_id)
+            _ = Contact.objects.get(user_id=self.lender_id, friend_id=self.borrower_id)
         except Contact.DoesNotExist:
             Contact.objects.create(user_id=self.lender_id, friend_id=self.borrower_id)
         super().save()
 
-    def create_notification(self):
-        description = self.lender_id.username + " dokonał zmian w pożyczce " + self.name
+    def create_notification(self, date):
+        description = "Zbliża się termin zwrotu pożyczki \"" + self.name + "\"."
         url = "localhost:3000/loan-money/" + str(self.pk)
-        Notification.objects.create(title="Edycja wypożyczenia", description=description, is_seen=False,
+        Notification.objects.create(title="Przypomnienie o upływającym terminie", description=description,
+                                    is_seen=False, show_date=date, receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_on_update(self):
+        description = "Użytkownik " + self.lender_id.username + " dokonał zmian w pożyczce \"" + self.name + "\"."
+        url = "localhost:3000/loan-money/" + str(self.pk)
+        Notification.objects.create(title="Edycja pożyczki", description=description, is_seen=False,
                                     show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_on_create(self):
+        description = "Użytkownik " + self.lender_id.username + " utworzył pożyczkę \"" + self.name + "\"."
+        url = "localhost:3000/loan-money/" + str(self.pk)
+        Notification.objects.create(title="Dodanie pożyczki", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_on_delete(self):
+        description = "Użytkownik " + self.lender_id.username + " usunął pożyczkę \"" + self.name + "\"."
+        url = "localhost:3000/loan-money/"
+        Notification.objects.create(title="Usunięcie pożyczki", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_on_return(self):
+        description = "Użytkownik " + self.lender_id.username + " przyjął zwrot pożyczki \"" + self.name + "\"."
+        url = "localhost:3000/loan-money/" + str(self.pk)
+        Notification.objects.create(title="Zwrot pożyczki", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_ask_for_return(self, date):
+        description = "Użytkownik " + self.lender_id.username + " prosi o szybszy zwrot pożyczki \"" + self.name + \
+                      "\". Proponowany termin: " + date
+        url = "localhost:3000/loan-money/" + str(self.pk)
+        Notification.objects.create(title="Prośba o szybszy zwrot pożyczki", description=description, is_seen=False,
+                                    show_date=datetime.date.today(), receiver_id=self.borrower_id, frontend_url=url)
+
+    def create_notification_ask_for_longer_return(self, date):
+        description = "Użytkownik " + self.lender_id.username + " prosi o wydłużenie terminu zwrotu pożyczki \"" + \
+                      self.name + "\". Proponowany termin: " + date
+        url = "localhost:3000/loan-money/" + str(self.pk)
+        Notification.objects.create(title="Prośba o wydłużenie terminu zwrotu pożyczki", description=description,
+                                    is_seen=False, show_date=datetime.date.today(), receiver_id=self.lender_id,
+                                    frontend_url=url)
+
 
 class Contact(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='contact_list_user_id')

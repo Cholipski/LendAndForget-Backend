@@ -68,7 +68,7 @@ class LoanSerializer(serializers.ModelSerializer):
         validated_data["borrower_id"] = instance.borrower_id
         validated_data["item_category_id"] = instance.item_category_id
         instance = super(LoanSerializer, self).update(instance, validated_data)
-        instance.create_notification()
+        instance.create_notification_on_update()
         return instance
 
 
@@ -107,7 +107,7 @@ class MoneyLoanSerializer(serializers.ModelSerializer):
         validated_data["borrower_id"] = instance.borrower_id
         validated_data["amount"] = instance.amount
         instance = super(MoneyLoanSerializer, self).update(instance, validated_data)
-        instance.create_notification()
+        instance.create_notification_on_update()
         return instance
 
 
