@@ -232,7 +232,8 @@ class SetAllAsSeen(generics.GenericAPIView):
 class DeleteNotification(generics.GenericAPIView):
     def delete(self, request):
         try:
-            notification = Notification.objects.get(id=request.data['id'], receiver_id_id=self.request.user)
+            notification_id = json.loads(request.body)
+            notification = Notification.objects.get(id=notification_id , receiver_id_id=self.request.user)
             notification.delete()
             return response.Response("Successfully notification deleted", status=status.HTTP_200_OK)
         except:
@@ -243,6 +244,7 @@ class DeleteNotification(generics.GenericAPIView):
 class DeleteAllNotification(generics.GenericAPIView):
     def delete(self, request):
         try:
+
             notification = Notification.objects.filter(receiver_id_id=self.request.user,
                                                        show_date__lte=datetime.date.today())
             notification.delete()
@@ -265,7 +267,8 @@ class ContactList(generics.ListCreateAPIView):
 
     def delete(self, request):
         try:
-            friend = Contact.objects.get(id=request.data['id'], user_id_id=self.request.user)
+            friend_id = json.loads(request.body)
+            friend = Contact.objects.get(id=friend_id, user_id_id=self.request.user)
             friend.delete()
             return response.Response("Successfully friend deleted", status=status.HTTP_200_OK)
         except:
