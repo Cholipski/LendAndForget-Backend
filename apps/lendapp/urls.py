@@ -22,9 +22,13 @@ urlpatterns = [
     path('delete-all-notifications/', views.DeleteAllNotification.as_view(), name="delete all notification"),
     path('all-notifications-mark-seen/', views.SetAllAsSeen.as_view(), name="Mark all notification as seen"),
     path('notifications/<int:pk>', views.NotificationDetail.as_view(), name=views.NotificationDetail.name),
-    path('request-return/', views.DeleteNotification.as_view(), name="Request earlier return"),
-    path('request-longer-time/', views.DeleteNotification.as_view(), name="Request longer return time"),
-    path('create-reminder/', views.DeleteNotification.as_view(), name="Set reminding notification"),
+
+    path('request-item-return/', views.RequestEarlierItemReturn.as_view(), name="Request earlier return"),
+    path('request-item-longer-time/', views.RequestLongerItemReturnTime.as_view(), name="Request longer return time"),
+    path('create-item-reminder/', views.SetItemNotification.as_view(), name="Set reminding notification"),
+    path('request-money-return/', views.RequestEarlierMoneyReturn.as_view(), name="Request earlier return"),
+    path('request-money-longer-time/', views.RequestLongerMoneyReturnTime.as_view(), name="Request longer return time"),
+    path('create-money-reminder/', views.SetMoneyNotification.as_view(), name="Set reminding notification"),
 
     path('contact/', views.ContactList.as_view(), name=views.ContactList.name),
     path('contact/<int:pk>', views.ContactDetail.as_view(), name=views.ContactDetail.name),

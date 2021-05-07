@@ -100,7 +100,9 @@ class MoneyLoan(models.Model):
 
     def save(self, *args, **kwargs):
         if self._state.adding is True:
+            super().save()
             self.create_notification_on_create()
+            return
         try:
             _ = Contact.objects.get(user_id=self.lender_id, friend_id=self.borrower_id)
         except Contact.DoesNotExist:

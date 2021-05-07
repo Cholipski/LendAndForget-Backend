@@ -194,7 +194,7 @@ class NotificationDetail(generics.RetrieveUpdateDestroyAPIView):
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class RequestLongerReturnTime(generics.GenericAPIView):
+class RequestLongerMoneyReturnTime(generics.GenericAPIView):
     def post(self, request):
         return_response = {
             'status': 403,
@@ -209,7 +209,7 @@ class RequestLongerReturnTime(generics.GenericAPIView):
             return JsonResponse(return_response)
 
 
-class RequestEarlierReturn(generics.GenericAPIView):
+class RequestEarlierMoneyReturn(generics.GenericAPIView):
     def post(self, request):
         return_response = {
             'status': 403,
@@ -224,7 +224,7 @@ class RequestEarlierReturn(generics.GenericAPIView):
             return JsonResponse(return_response)
 
 
-class SetNotification(generics.GenericAPIView):
+class SetMoneyNotification(generics.GenericAPIView):
     def post(self, request):
         return_response = {
             'status': 403,
@@ -232,6 +232,51 @@ class SetNotification(generics.GenericAPIView):
         try:
             lend_id = json.loads(request.body)
             loan = MoneyLoan.objects.get(id=lend_id)
+            loan.create_notification(request.body.date)
+            return_response['status'] = 200
+            return JsonResponse(return_response)
+        except Exception:
+            return JsonResponse(return_response)
+
+
+class RequestLongerItemReturnTime(generics.GenericAPIView):
+    def post(self, request):
+        return_response = {
+            'status': 403,
+        }
+        try:
+            lend_id = json.loads(request.body)
+            loan = Loan.objects.get(id=lend_id)
+            loan.create_notification_ask_for_longer_return(request.body.date)
+            return_response['status'] = 200
+            return JsonResponse(return_response)
+        except Exception:
+            return JsonResponse(return_response)
+
+
+class RequestEarlierItemReturn(generics.GenericAPIView):
+    def post(self, request):
+        return_response = {
+            'status': 403,
+        }
+        try:
+            lend_id = json.loads(request.body)
+            loan = Loan.objects.get(id=lend_id)
+            loan.create_notification_ask_for_return(request.body.date)
+            return_response['status'] = 200
+            return JsonResponse(return_response)
+        except Exception:
+            return JsonResponse(return_response)
+
+
+class SetItemNotification(generics.GenericAPIView):
+    def post(self, request):
+        return_response = {
+            'status': 403,
+        }
+        try:
+            lend_id = json.loads(request.body)
+            loan = Loan.objects.get(id=lend_id)
             loan.create_notification(request.body.date)
             return_response['status'] = 200
             return JsonResponse(return_response)
