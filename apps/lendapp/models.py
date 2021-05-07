@@ -34,7 +34,9 @@ class Loan(models.Model):
 
     def save(self, *args, **kwargs):
         if self._state.adding is True:
+            super().save()
             self.create_notification_on_create()
+            return
         try:
             _ = Contact.objects.get(user_id=self.lender_id, friend_id=self.borrower_id)
         except Contact.DoesNotExist:
@@ -161,7 +163,7 @@ class Contact(models.Model):
 
 
 class Notification(models.Model):
-    title = models.CharField(max_length=45, null=False)
+    title = models.CharField(max_length=127, null=False)
     description = models.CharField(max_length=255, null=False)
     is_seen = models.BooleanField(null=False)
     show_date = models.DateField(null=False)
