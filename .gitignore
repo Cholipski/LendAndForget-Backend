@@ -14,8 +14,10 @@
 *.iws /out/
 
 # Django #
+.idea/*
 *.log
 *.pot
 *.pyc
 __pycache__
 media
+.env

@@ -1,0 +1,1 @@
+web: gunicorn lend_and_forget.wsgi --logfile -
