@@ -30,7 +30,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost",
                  'https://hosting2049919.online.pro'
-                 , 'https://lend-and-forget.herokuapp.com/']
+                 , 'https://lend-and-forget.herokuapp.com']
 
 
 # Application definition

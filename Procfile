@@ -1,1 +1,1 @@
-web: gunicorn lend_and_forget.wsgi --logfile -
+web: gunicorn lend_and_forget.wsgi --log-file -
