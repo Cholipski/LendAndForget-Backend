@@ -14,23 +14,20 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
-from dj_database_url import parse as dburl
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from django.conf import settings
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost",
-                 'https://hosting2049919.online.pro'
-                 , 'https://lend-and-forget.herokuapp.com']
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 
 # Application definition
@@ -117,23 +114,19 @@ SIMPLE_JWT = {
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-default_dburl = config('DATABASE_URL')
+DATABASES = {
 
-DATABASES = { 'default': config('DATABASE_URL', default=default_dburl, cast=dburl), }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'lendapp',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
 
-# DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#        'NAME': '00436236_lendapp',
-#        'USER': '00436236_lendapp',
-#        'PASSWORD': 'NvHGsu30',
-#        'HOST': 'hosting2049919.online.pro',
-#        'PORT': '3306',
-#        'OPTIONS': {
-#                    'charset': 'latin2',
-#                    'use_unicode': True, },
-#    }
-# }
+    }
+
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -177,13 +170,11 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'Backend')
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'public', 'static')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'public', 'media')
 
 
 # Cors Settings
@@ -191,11 +182,13 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
-    'https://hosting2049919.online.pro',
 ]
 
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+EMAIL_BACKEND = config('EMAIL_BACKEND')
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'lendapp.noreply@gmail.com'
-EMAIL_HOST_PASSWORD = 'NvHGsu3O'
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+

@@ -47,7 +47,7 @@ class RegisterView(GenericAPIView):
             user.is_active = False
             user.save()
             token = RefreshToken.for_user(user)
-            url = 'https://hosting2049919.online.pro/email-verify/' + str(token)
+            url = 'http:/localhost/email-verify/' + str(token)
             email_body = "Hi " + user.username + '! \nUse link below to activate your account!. \n' + url
             data = {"to_email": user.email, "email_body": email_body, 'email_subject': 'Verify your email!'}
             Util.send_activation_email(data)
