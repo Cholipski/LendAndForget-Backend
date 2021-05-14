@@ -4,16 +4,15 @@ Django Rest Api do projektu "Pożycz i zapomnij"
   
 ##Instalacja  
   
-1) Utworzyć plik ``.env`` w głownym katalogu  
-2) W pliku ``.env`` umieścić  `SECRECT_KEY`  
-  
-  Przykład. `SECRET_KEY=AAAAAAAAAAAAAAAAAAAA`  
+1) Skopiować plik ``.env.example``  oraz usunąć `.example`
+2) Uzupełnić plik `.env` wprowadzając dane konta mailingowego (połaczenie SMTP) oraz wygenerowany SECRECT KEY
+   
   
   **(W pliku nie moze być żadnych spacj)**  
   
-    Do wygenerowania można użyć https://djecrety.ir  
+    Do wygenerowania SECTECT_KEY można użyć https://djecrety.ir  
   
-3) W pliku `settings.py` zmieniamy ustawienia bazy danych oraz dane do konta mailowego SMTP
+3) W pliku `settings.py` zmieniamy ustawienia bazy danych
 4) Uruchamiamy polecenie `Poetry install`
 5) Następnie `Potery run python manage.py migrate`
 6) Tworzymy superusera poleceniem `Poetry run python manage.py createsuperuser`
