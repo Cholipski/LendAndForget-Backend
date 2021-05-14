@@ -65,7 +65,7 @@ ROOT_URLCONF = 'lend_and_forget.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'apps/authorization/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
