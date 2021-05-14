@@ -14,7 +14,6 @@ from .serializers import UserSerializer, UserProfileSerializer, MyTokenObtainPai
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.conf import settings
 from django.template.loader import get_template
-from django.template import Context
 from django.core.mail import EmailMultiAlternatives
 
 
@@ -52,10 +51,10 @@ class RegisterView(GenericAPIView):
             subject = "Lend and forget - Verify your email!"
             plaintext = get_template('email.txt')
             htmly = get_template('email.html')
-            var_dict = Context({ 'user': user.first_name, 'token': token })
+            var_dict = {'user': user.first_name, 'token': token}
             text_content = plaintext.render(var_dict)
             html_content = htmly.render(var_dict)
-            msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, user.email)
+            msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, [user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
             return Response(serializer.data, status=status.HTTP_200_OK)
