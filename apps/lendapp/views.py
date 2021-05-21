@@ -1,16 +1,22 @@
 import datetime
-from rest_framework import generics, serializers, response, status
-from rest_framework.permissions import IsAuthenticated
-from django.http import JsonResponse
+import json
+
+from django.core.exceptions import ObjectDoesNotExist
+
 from .models import ItemCategory, LoanStatus, Loan, MoneyLoan, Notification, Contact
 from .serializers import ItemCategorySerializer, LoanStatusSerializer, LoanSerializer, MoneyLoanSerializer, \
     NotificationSerializer, ContactSerializer
+
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from rest_framework import generics, serializers, response, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
-import json
-
 
 # <editor-fold desc="Categories">
+
+
 class ItemCategoryList(generics.ListCreateAPIView):
     queryset = ItemCategory.objects.all()
     serializer_class = ItemCategorySerializer
@@ -21,12 +27,10 @@ class ItemCategoryDetail(generics.RetrieveAPIView):
     queryset = ItemCategory.objects.all()
     serializer_class = ItemCategorySerializer
     name = 'itemcategory-detail'
-
-
 # </editor-fold>
-
-
 # <editor-fold desc="Statuses">
+
+
 class LoanStatusList(generics.ListCreateAPIView):
     queryset = LoanStatus.objects.all()
     serializer_class = LoanStatusSerializer
@@ -37,13 +41,9 @@ class LoanStatusDetail(generics.RetrieveAPIView):
     queryset = LoanStatus.objects.all()
     serializer_class = LoanStatusSerializer
     name = 'loan-status-detail'
-
-
 # </editor-fold>
+# <editor-fold desc="Item loan">
 
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Item Loan
 
 class LoanList(generics.ListCreateAPIView):
     serializer_class = LoanSerializer
@@ -52,6 +52,23 @@ class LoanList(generics.ListCreateAPIView):
     lender_id = serializers.PrimaryKeyRelatedField(
         read_only=True,
     )
+
+    def create(self, request, *args, **kwargs):
+        data = self.request.data
+        try:
+            borrower = User.objects.get(email=data['borrower_id'])
+            if self.request.user != borrower:
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            else:
+                return Response({'borrower_id': 'You can not lend item for yourself'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        except ObjectDoesNotExist:
+            return Response({'borrower_id': 'Object with email=' + data['borrower_id'] + ' does not exist.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         serializer.save(lender_id=self.request.user, loan_status_id_id="1")
@@ -70,14 +87,12 @@ class LoanDetail(generics.RetrieveUpdateDestroyAPIView):
         self.get_object().create_notification_on_delete()
         serializer = self.get_serializer(self.get_object())
         super().destroy(*args, **kwargs)
-        return response.Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# ----------------------------------------------------------------------------------------------------------------------
+# </editor-fold>
+# <editor-fold desc="Money loan">
 
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Money Loan
 
 class MoneyLoanList(generics.ListCreateAPIView):
     serializer_class = MoneyLoanSerializer
@@ -86,6 +101,23 @@ class MoneyLoanList(generics.ListCreateAPIView):
     lender_id = serializers.PrimaryKeyRelatedField(
         read_only=True,
     )
+
+    def create(self, request, *args, **kwargs):
+        data = self.request.data
+        try:
+            borrower = User.objects.get(email=data['borrower_id'])
+            if self.request.user != borrower:
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            else:
+                return Response({'borrower_id': 'You can not lend item for yourself'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        except ObjectDoesNotExist:
+            return Response({'borrower_id': 'Object with email=' + data['borrower_id'] + ' does not exist.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         serializer.save(lender_id=self.request.user, loan_status_id_id="1")
@@ -106,13 +138,9 @@ class MoneyLoanDetail(generics.RetrieveUpdateDestroyAPIView):
         serializer = self.get_serializer(self.get_object())
         super().destroy(*args, **kwargs)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
+# </editor-fold>
+# <editor-fold desc="API ROOT">
 
-
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# ApiRoot view
 
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
@@ -122,13 +150,9 @@ class ApiRoot(generics.GenericAPIView):
                          'loan_status': reverse(LoanStatusList.name, request=request),
                          'loan': reverse(LoanList.name, request=request),
                          })
+# </editor-fold>
+# <editor-fold desc="Returns">
 
-
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Return item
 
 class ReturnLend(generics.GenericAPIView):
     def post(self, request):
@@ -147,12 +171,6 @@ class ReturnLend(generics.GenericAPIView):
             return JsonResponse(return_response)
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Return money
-
 class ReturnMoneyLend(generics.GenericAPIView):
     def post(self, request):
         return_response = {
@@ -169,8 +187,8 @@ class ReturnMoneyLend(generics.GenericAPIView):
         except Exception:
             return JsonResponse(return_response)
 
-
-# ----------------------------------------------------------------------------------------------------------------------
+# </editor-fold>
+# <editor-fold desc="Notifications">
 
 
 class NotificationList(generics.ListCreateAPIView):
@@ -192,6 +210,8 @@ class NotificationDetail(generics.RetrieveUpdateDestroyAPIView):
         serializer = self.get_serializer(self.get_object())
         super().destroy(*args, **kwargs)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+# <editor-fold desc="Requests and reminders">
 
 
 class RequestLongerMoneyReturnTime(generics.GenericAPIView):
@@ -228,12 +248,18 @@ class SetMoneyNotification(generics.GenericAPIView):
     def post(self, request):
         return_response = {
             'status': 403,
+            'exist': 0
         }
         try:
             data = json.loads(request.body)
             loan = MoneyLoan.objects.get(id=data['id'])
-            loan.create_notification(data['date'])
-            return_response['status'] = 200
+            exist = Notification.objects.filter(show_date=data['date']).filter(title__startswith="Przypomnienie") \
+                .filter(frontend_url__endswith=str("loan-money/" + str(loan.pk)))
+            if exist.count() == 0:
+                loan.create_notification(data['date'])
+                return_response['status'] = 200
+            else:
+                return_response['status'] = 400
             return JsonResponse(return_response)
         except Exception:
             return JsonResponse(return_response)
@@ -277,11 +303,18 @@ class SetItemNotification(generics.GenericAPIView):
         try:
             data = json.loads(request.body)
             loan = Loan.objects.get(id=data['id'])
-            loan.create_notification(data['date'])
-            return_response['status'] = 200
+            exist = Notification.objects.filter(show_date=data['date']).filter(title__startswith="Przypomnienie") \
+                .filter(frontend_url__endswith=str("loan-items/" + str(loan.pk)))
+            if exist.count() == 0:
+                loan.create_notification(data['date'])
+                return_response['status'] = 200
+            else:
+                return_response['status'] = 400
             return JsonResponse(return_response)
         except Exception:
             return JsonResponse(return_response)
+# </editor-fold>
+# <editor-fold desc="Seen">
 
 
 class SetAsSeen(generics.GenericAPIView):
@@ -311,6 +344,8 @@ class SetAllAsSeen(generics.GenericAPIView):
             return response.Response("Successfully set all notification as seen", status=status.HTTP_200_OK)
         except:
             return response.Response("Notification not found", status=status.HTTP_400_BAD_REQUEST)
+# </editor-fold>
+# <editor-fold desc="Delete">
 
 
 class DeleteNotification(generics.GenericAPIView):
@@ -324,6 +359,7 @@ class DeleteNotification(generics.GenericAPIView):
         except Exception:
             return response.Response("Notification not found", status=status.HTTP_400_BAD_REQUEST)
 
+
 class DeleteAllNotification(generics.GenericAPIView):
     def delete(self, request):
         try:
@@ -335,9 +371,9 @@ class DeleteAllNotification(generics.GenericAPIView):
 
         except Exception:
             return response.Response("No notifications were found for this user", status=status.HTTP_400_BAD_REQUEST)
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Contact list
+# </editor-fold>
+# </editor-fold>
+# <editor-fold desc="Contact list">
 
 
 class ContactList(generics.ListCreateAPIView):
@@ -362,7 +398,4 @@ class ContactDetail(generics.RetrieveAPIView):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
     name = 'contact-detail'
-
-
-
-# ----------------------------------------------------------------------------------------------------------------------
+# </editor-fold>

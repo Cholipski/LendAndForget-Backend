@@ -20,7 +20,8 @@ urlpatterns = [
     path('notifications/', views.NotificationList.as_view(), name=views.NotificationList.name),
     path('delete-notifications/', views.DeleteNotification.as_view(), name="delete notification"),
     path('delete-all-notifications/', views.DeleteAllNotification.as_view(), name="delete all notification"),
-    path('all-notifications-mark-seen/', views.SetAllAsSeen.as_view(), name="Mark all notification as seen"),
+    path('all-notifications-mark-seen/', views.SetAllAsSeen.as_view(), name="Mark all notifications as seen"),
+    path('notifications-mark-seen/', views.SetAsSeen.as_view(), name="Mark notification as seen"),
     path('notifications/<int:pk>', views.NotificationDetail.as_view(), name=views.NotificationDetail.name),
 
     path('request-item-return/', views.RequestEarlierItemReturn.as_view(), name="Request earlier return"),
@@ -35,7 +36,7 @@ urlpatterns = [
 
     path('item-return/', views.ReturnLend.as_view(), name="Return a loan"),
     path('money-return/', views.ReturnMoneyLend.as_view(), name="Return money"),
-    path('notifications-mark-seen/', views.SetAsSeen.as_view(), name="Return money"),
+
 
     path('', views.ApiRoot.as_view(), name=views.ApiRoot.name),
 ]
