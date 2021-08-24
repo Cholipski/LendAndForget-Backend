@@ -1,0 +1,3 @@
+Hi, {{ user }}!
+Use link below to activate your account!
+https://lendandforget.ysoserious.usermd.net/email-verify/{{ token }}
